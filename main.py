@@ -14,6 +14,9 @@ def main() -> None:
     assert 1 <= len(JOKE) <= 199, "joke must be 1-199 characters"
     assert "\n" not in JOKE and "\r" not in JOKE, "joke must be a single line"
     assert JOKE.strip() == JOKE and JOKE, "joke must not be only whitespace"
+    # The gate counts the file's characters: one line plus its newline.
+    expected_bytes = (JOKE + "\n").encode("utf-8")
+    assert 1 <= len(expected_bytes) - 1 <= 199, "entry must be 1-199 characters"
 
     out_dir = (
         os.environ.get("ENTRY_OUTPUT")
@@ -32,7 +35,10 @@ def main() -> None:
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(JOKE + "\n")
 
-    # Self-check the file we just wrote.
+    # Self-check the file we just wrote: byte-identical to what we intended.
+    with open(path, "rb") as f:
+        raw = f.read()
+    assert raw == expected_bytes, "entry.txt bytes mismatch"
     with open(path, "r", encoding="utf-8") as f:
         text = f.read()
     lines = text.split("\n")
